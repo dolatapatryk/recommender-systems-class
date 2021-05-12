@@ -141,16 +141,6 @@ class DataPreprocessingToolkit(object):
         df = df.drop(columns=['mean_night_price'])
         return df
 
-    # def map_night_price_to_room_segment_buckets(self, df):
-    #     night_prices = df.loc[df['accomodation_price'] > 1]\
-    #         .groupby(['term', 'room_group_id'])['night_price'].mean().reset_index()
-    #     night_prices.columns = ['term', 'room_group_id', 'termnight_price']
-    #     df = pd.merge(df, night_prices, on=['term', 'room_group_id'], how='left')
-    #     df.loc[:, 'room_segment'] = df['termnight_price'].apply(
-    #         lambda x: self.map_value_to_bucket(x, self.room_segment_buckets))
-    #     df = df.drop(columns=['termnight_price'])
-    #     return df
-
     def map_npeople_to_npeople_buckets(self, df):
         df.loc[:, 'n_people_bucket'] = df['n_people'].apply(lambda x: self.map_value_to_bucket(x, self.npeople_buckets))
         return df
@@ -207,7 +197,7 @@ class DataPreprocessingToolkit(object):
             return "Autumn"
 
     def map_value_to_bucket(self, value, buckets):
-        if value == "":
+        if value == "" or value is None or pd.isna(value):
             return str(buckets[0]).replace(", ", "-")
         for bucket in buckets:
             if bucket[0] <= value <= bucket[1]:
